@@ -1,33 +1,32 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
+import apiEndpoints from "../constants/apiEndpoints.js";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    schoolList: [],
+    bankList: [],
     editedObj: null,
     loading: false,
     error: null,
   },
   getters: {
-    getSchoolList: (state) => state.schoolList,
+    getBankList: (state) => state.bankList,
     getEditedObj: (state) => state.editedObj,
     isLoading: (state) => state.loading,
     hasError: (state) => state.error,
   },
   mutations: {
-    deleteSchool(state, schoolId) {
-      state.schoolList = state.schoolList.filter(
-        (item) => item._id !== schoolId
-      );
+    deleteBank(state, bankId) {
+      state.bankList = state.bankList.filter((item) => item._id !== bankId);
     },
     setEditedObj(state, obj) {
       state.editedObj = obj;
     },
-    setSchoolList(state, list) {
-      state.schoolList = list;
+    setBankList(state, list) {
+      state.bankList = list;
     },
     setLoading(state, loading) {
       state.loading = loading;
@@ -37,14 +36,14 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    loadSchool({ commit }) {
+    loadBank({ commit }) {
       commit("setLoading", true);
       commit("setError", null);
       axios
-        .get("http://localhost:3000/school")
+        .get(apiEndpoints.banks.readList)
         .then((res) => res.data)
         .then((resData) => {
-          if (resData.success) commit("setSchoolList", resData.data);
+          if (resData.success) commit("setBankList", resData.data);
           else throw new Error("Fetch failed!");
         })
         .catch((err) => {
@@ -53,17 +52,17 @@ export default new Vuex.Store({
         .finally(() => commit("setLoading", false));
     },
 
-    deleteSchoolCart({ commit }, schoolId) {
+    deleteBankCart({ commit }, bankId) {
       commit("setLoading", true);
       commit("setError", null);
 
       axios
-        .delete("http://localhost:3000/school", {
-          schoolId,
+        .delete(apiEndpoints.banks.delete, {
+          bankId,
         })
         .then((res) => res.data)
         .then((resData) => {
-          if (resData.success) commit("deleteSchool", schoolId);
+          if (resData.success) commit("deleteBank", bankId);
           else throw new Error("Fetch failed!");
         })
         .catch((err) => {
@@ -72,19 +71,20 @@ export default new Vuex.Store({
         .finally(() => commit("setLoading", false));
     },
 
-    createSchool(
+    createBank(
       { commit },
-      { schoolSubject, schoolTeacher, schoolClass, schoolTime }
+      { bankName, bankRate, bankCredit, bankPayment, bankTerm }
     ) {
       commit("setLoading", true);
       commit("setError", null);
       return new Promise((resolve, reject) => {
         axios
-          .post("http://localhost:3000/school/add", {
-            schoolSubject,
-            schoolTeacher,
-            schoolClass,
-            schoolTime,
+          .post(apiEndpoints.banks.create, {
+            bankName,
+            bankRate,
+            bankCredit,
+            bankPayment,
+            bankTerm,
           })
           .then((res) => res.data)
           .then((resData) => {
@@ -99,12 +99,12 @@ export default new Vuex.Store({
       });
     },
 
-    getSchoolById({ commit }, schoolId) {
+    getBankById({ commit }, bankId) {
       commit("setLoading", true);
       commit("setError", null);
       return new Promise((resolve, reject) => {
         axios
-          .get(`http://localhost:3000/school/${schoolId}`)
+          .get(apiEndpoints.banks.getBankById(bankId))
           .then((res) => res.data)
           .then((resData) => {
             if (resData.success) {
@@ -120,20 +120,21 @@ export default new Vuex.Store({
       });
     },
 
-    updateSchool(
+    updateBank(
       { commit, state },
-      { schoolSubject, schoolTeacher, schoolClass, schoolTime }
+      { bankName, bankRate, bankCredit, bankPayment, bankTerm }
     ) {
       commit("setLoading", true);
       commit("setError", null);
       return new Promise((resolve, reject) => {
         axios
-          .put("http://localhost:3000/school/update", {
-            schoolId: state.editedObj._id,
-            schoolSubject,
-            schoolTeacher,
-            schoolClass,
-            schoolTime,
+          .put(apiEndpoints.banks.update, {
+            bankId: state.editedObj._id,
+            bankName,
+            bankRate,
+            bankCredit,
+            bankPayment,
+            bankTerm,
           })
           .then((res) => res.data)
           .then((resData) => {
