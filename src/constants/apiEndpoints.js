@@ -5,5 +5,6 @@ export default {
     update: `${process.env.VUE_APP_API_URL}/bank/update`,
     delete: `${process.env.VUE_APP_API_URL}/bank`,
     getBankById: (bankId) => `${process.env.VUE_APP_API_URL}/bank/${bankId}`,
+    findBankById: (bankId) => `${process.env.VUE_APP_API_URL}/bank/${bankId}`,
   },
 };

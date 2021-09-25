@@ -12,6 +12,7 @@
         <span>Loan term - {{ bank.term }}</span>
         <div><button @click="onDelete(bank._id)">delete</button></div>
         <button @click="onEdit(bank._id)">edit</button>
+
         <hr />
       </div>
     </div>

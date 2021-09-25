@@ -52,25 +52,6 @@ export default new Vuex.Store({
         .finally(() => commit("setLoading", false));
     },
 
-    deleteBankCart({ commit }, bankId) {
-      commit("setLoading", true);
-      commit("setError", null);
-
-      axios
-        .delete(apiEndpoints.banks.delete, {
-          bankId,
-        })
-        .then((res) => res.data)
-        .then((resData) => {
-          if (resData.success) commit("deleteBank", bankId);
-          else throw new Error("Fetch failed!");
-        })
-        .catch((err) => {
-          commit("setError", err);
-        })
-        .finally(() => commit("setLoading", false));
-    },
-
     createBank(
       { commit },
       { bankName, bankRate, bankCredit, bankPayment, bankTerm }
@@ -114,6 +95,41 @@ export default new Vuex.Store({
           })
           .catch((err) => {
             commit("setError", err);
+            reject(err);
+          })
+          .finally(() => commit("setLoading", false));
+      });
+    },
+    deleteBankCart({ commit }, bankId) {
+      commit("setLoading", true);
+      commit("setError", null);
+
+      axios
+        .delete(apiEndpoints.banks.delete, {
+          bankId,
+        })
+        .then((res) => res.data)
+        .then((resData) => {
+          if (resData.success) commit("deleteBank", bankId);
+          else throw new Error("Fetch failed!");
+        })
+        .catch((err) => {
+          commit("setError", err);
+        })
+        .finally(() => commit("setLoading", false));
+    },
+    findBankById({ commit }, id) {
+      commit("setLoading", true);
+      commit("setError", null);
+      return new Promise((resolve, reject) => {
+        axios
+          .get(apiEndpoints.banks.findBankById(id))
+          .then((res) => res.data)
+          .then((resData) => {
+            if (resData.success) resolve(resData.data);
+          })
+          .catch((err) => {
+            commit("hasError", err);
             reject(err);
           })
           .finally(() => commit("setLoading", false));
