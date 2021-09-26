@@ -4,13 +4,13 @@
     <div v-if="hasError">error</div>
     <b-field label="Initial loan" type="is-not-success">
       <b-input
-        placeholder="Enter initial loan"
+        placeholder="example: $280.000"
         v-model.number="initialLoan"
       ></b-input>
     </b-field>
     <b-field label="Down payment" type="is-not-success">
       <b-input
-        placeholder="Enter down payment"
+        placeholder="example: $20.000"
         v-model.number="downPayment"
       ></b-input>
     </b-field>
@@ -22,15 +22,15 @@
       </b-select>
     </b-field>
 
-    <b-field label="Number of monthly payments" type="is-not-success">
-      <b-input
-        placeholder="Enter number of monthly payments"
-        v-model.number="Monthpayment"
-      ></b-input>
-    </b-field>
-    <b-button rounded @click="onCalculate">Calculate</b-button>
+    <b-button rounded :disabled="!isDataValid" @click="onCalculate()"
+      >Calculate</b-button
+    >
     <hr />
-    <span> result - {{ monthPay }}</span>
+    <div v-if="result">
+      result -
+      {{ result }}
+    </div>
+    <div v-if="error">{{ error }}</div>
   </div>
 </template>
 <script>
@@ -43,7 +43,7 @@ export default {
       Monthpayment: null,
       downPayment: null,
 
-      monthPay: null,
+      result: null,
 
       selectedBank: null,
       bankName: null,
@@ -56,26 +56,30 @@ export default {
   },
   computed: {
     ...mapGetters(["getBankList", "isLoading", "hasError"]),
+    isDataValid() {
+      return this.initialLoan && this.downPayment;
+    },
   },
   methods: {
     ...mapActions(["loadBank", "getBankById", "findBankById"]),
     async onCalculate() {
-      if (this.selectedBank) {
-        const resData = await this.getBankById(this.selectedBank);
-        this.bankName = resData.bankName;
-        this.bankRate = resData.bankRate;
-        this.bankCredit = resData.bankCredit;
-        this.bankPayment = resData.bankPayment;
-        this.bankTerm = resData.bankTerm;
-      }
-
-      // this.monthPay = this.initialLoan + this.downPayment + this.payment;
-      this.monthPay = (
-        (this.initialLoan *
-          (this.bankRate / 12) *
-          Math.pow(1 + this.bankRate / 12, this.bankPayment)) /
-        (Math.pow(1 + this.bankRate / 12, this.bankPayment) - 1)
-      ).toFixed(2);
+      const resData = await this.getBankById(this.selectedBank);
+      this.bankName = resData.name;
+      this.bankRate = parseFloat(resData.rate);
+      this.bankCredit = parseFloat(resData.credit);
+      this.bankPayment = parseFloat(resData.payment);
+      this.bankTerm = parseFloat(resData.term);
+      let rate = this.bankRate / 100 / 12;
+      console.log(this.bankRate, this.bankTerm);
+      if (
+        this.initialLoan < this.bankCredit &&
+        this.downPayment > this.bankPayment
+      ) {
+        this.result = (
+          (this.initialLoan * rate * Math.pow(1 + rate, this.bankTerm)) /
+          (Math.pow(1 + rate, this.bankTerm) - 1)
+        ).toFixed(2);
+      } else this.result = "Please enter values";
     },
   },
   mounted() {

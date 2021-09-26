@@ -51,7 +51,6 @@ export default new Vuex.Store({
         })
         .finally(() => commit("setLoading", false));
     },
-
     createBank(
       { commit },
       { bankName, bankRate, bankCredit, bankPayment, bankTerm }
@@ -118,12 +117,12 @@ export default new Vuex.Store({
         })
         .finally(() => commit("setLoading", false));
     },
-    findBankById({ commit }, id) {
+    findBankById({ commit }, bankId) {
       commit("setLoading", true);
       commit("setError", null);
       return new Promise((resolve, reject) => {
         axios
-          .get(apiEndpoints.banks.findBankById(id))
+          .get(apiEndpoints.banks.findBankById(bankId))
           .then((res) => res.data)
           .then((resData) => {
             if (resData.success) resolve(resData.data);
