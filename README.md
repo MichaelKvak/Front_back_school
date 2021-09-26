@@ -1,4 +1,4 @@
-# front_school
+# front_bank
 
 ## Project setup
 ```
